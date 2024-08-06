@@ -9,9 +9,6 @@ from tkinter import messagebox
 
 openai.api_key_path="/home/mat/Documents/ProgramExperiments/openAIapiKey"
 
-# calling these quickly before craziness starts
-og_article_text = copy_text()
-URL = grab_link()
 
 
 prePrompt1 = """
@@ -55,22 +52,22 @@ def textFromAI(text):
 
 # sub this out for appropriate submit functions
 def on_submit():
-    entered_text = text_box.get("1.0", tk.END).strip()
-    clozeReturn = textFromAI(entered_text)
+    cloze_input  = text_box.get("1.0", tk.END).strip()
+    cloze_return = textFromAI(cloze_input)
 
     #Anki note contents
     #articleLink in the Source
     note = {
         "deckName": "Big Daddy::fact2cloze",
         "modelName": "Cloze",
-        "fields": {"Text": clozeReturn, 
+        "fields": {"Text": cloze_return , 
                    #"Extra": "<br><br>OG text: " + og_article_text,
                    "Source": og_article_text + "\n\n\n" + URL
                    },
         "tags": ["fact2cloze"]
     }
 
-    if not entered_text:
+    if not cloze_input:
         print("no prompt")
         s.call(['notify-send', '-t', '2000', 'fact2cloze', 'empty prompt!'])
     else:
@@ -78,9 +75,9 @@ def on_submit():
         try:
             connect.invoke('addNote', note=note)
         except Exception:
-            print(clozeReturn + "\n\n")
+            print(cloze_return + "\n\n")
             print("did this have a cloze in it?")
-        s.call(['notify-send', '-t', '2000', 'fact2cloze', clozeReturn])
+        s.call(['notify-send', '-t', '2000', 'fact2cloze', cloze_return])
 
         root.destroy()
 
@@ -89,9 +86,12 @@ def focus_next_widget(event):
     return "break"
 
 
+# calling these quickly before craziness starts
+og_article_text = copy_text()
+URL = grab_link()
+
 
 ### Tkinter code
-
 # main window
 root = tk.Tk()
 root.title("Knowledge Hack")
