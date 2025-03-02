@@ -63,12 +63,13 @@ def textFromAI(text):
 def on_submit():
     cloze_input  = text_box.get("1.0", tk.END).strip()
     cloze_return = textFromAI(cloze_input)
-    print(cloze_return)
 
     #Anki note contents
     #articleLink in the Source
+    anki_deck_name = os.environ["ANKI_DECK_NAME"]
+
     note = {
-        "deckName": "Big Daddy::fact2cloze",
+        "deckName": anki_deck_name ,
         "modelName": "Cloze",
         "fields": {"Text": cloze_return , 
                    #"Extra": "<br><br>OG text: " + og_article_text,
@@ -125,4 +126,5 @@ submit_button.bind('<Return>', lambda event=None: on_submit())
 submit_button.pack()
 
 
+submit_button.bind('<Return>', lambda event=None: on_submit())
 root.mainloop()
