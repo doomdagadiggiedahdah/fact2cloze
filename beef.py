@@ -7,10 +7,6 @@ import subprocess as s
 import tkinter as tk
 from tkinter import messagebox
 
-openai.api_key_path="/home/mat/Documents/ProgramExperiments/openAIapiKey"
-
-
-
 prePrompt1 = """
 I want you to create a cloze deletion card for an Anki Deck out of a string of text I pass. A cloze deletion is a single or group of words enclosed like follows.
 {{c1::interesting fact}}. The goal of the clozes is to withhold the important pieces of info so that I'm tested on recalling them.
@@ -21,6 +17,7 @@ Result: A {{c1::large language model (LLM)}} is a {{c2::neural network}} with {{
 Instructions:
 Keep the amount of words inside the clozes to no more than 4 words. 
 Only make one cloze for approx every five words, but only make one for important concepts of the sentence.
+Reply with only the cloze_card content, only what will be shown on the card.
 
 Input:
 """
@@ -41,9 +38,10 @@ def grab_link():
 
 def textFromAI(text):
     res = openai.ChatCompletion.create(
-        model = "gpt-3.5-turbo",
+        model = "gpt-4o-mini",
         messages=[
-            {"role": "system", "content": prePrompt1},
+            {"role": "system", "content": "you are a world class learning coach, taking given facts and creating flash cards for your student."},
+            {"role": "assistant", "content": prePrompt1},
             {"role": "user", "content": text}
         ])
     story = res["choices"][0]["message"]["content"]
