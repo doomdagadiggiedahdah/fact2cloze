@@ -1,10 +1,13 @@
+import os
+import sys
 import time
+from openai import OpenAI
 import connect
 import pyperclip
-import openai
-import pyautogui as pya
+import tkinter    as tk
+import pyautogui  as pya
 import subprocess as s
-import tkinter as tk
+from dotenv  import load_dotenv
 from tkinter import messagebox
 
 prePrompt1 = """
@@ -22,6 +25,14 @@ Reply with only the cloze_card content, only what will be shown on the card.
 Input:
 """
 
+load_dotenv()
+api_key = os.environ.get("OPENAI_API_KEY")
+if not api_key:
+    # Handle missing key - either use a default or raise an error
+    print("API key not found in environment", file=sys.stderr)
+    sys.exit(1)
+
+client = OpenAI(api_key=api_key)
 
 def copy_text():
     time.sleep(.2)
@@ -37,14 +48,14 @@ def grab_link():
     return pyperclip.paste().strip()
 
 def textFromAI(text):
-    res = openai.ChatCompletion.create(
+    res = client.chat.completions.create(
         model = "gpt-4o-mini",
         messages=[
             {"role": "system", "content": "you are a world class learning coach, taking given facts and creating flash cards for your student."},
             {"role": "assistant", "content": prePrompt1},
             {"role": "user", "content": text}
         ])
-    story = res["choices"][0]["message"]["content"]
+    story = res.choices[0].message.content
     return str(story)
 
 
@@ -52,6 +63,7 @@ def textFromAI(text):
 def on_submit():
     cloze_input  = text_box.get("1.0", tk.END).strip()
     cloze_return = textFromAI(cloze_input)
+    print(cloze_return)
 
     #Anki note contents
     #articleLink in the Source
@@ -109,9 +121,8 @@ text_box.focus_set() #puts cursor in the text box
 # Create a Button to submit the text
 text_box.bind('<Tab>', focus_next_widget)
 submit_button = tk.Button(root, text="Submit", command=on_submit)
+submit_button.bind('<Return>', lambda event=None: on_submit())
 submit_button.pack()
 
-# Bind the Enter key to the Submit button
-submit_button.bind('<Return>', lambda event=None: on_submit())
 
 root.mainloop()
